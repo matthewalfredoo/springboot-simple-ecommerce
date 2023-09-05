@@ -26,4 +26,11 @@ public class ProductServiceImpl implements ProductService {
         return products;
     }
 
+    @Override
+    public Product getProductById(Long id) {
+        //TODO: Handle exception, such as product not found, etc.
+        Product product = productRepository.findById(id).get();
+        return product;
+    }
+
 }

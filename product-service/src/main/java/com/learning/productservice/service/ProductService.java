@@ -10,9 +10,9 @@ public interface ProductService {
 
     List<Product> getAllProducts();
 
-    /*Product getProductById(Long id);
+    Product getProductById(Long id);
 
-    Product updateProduct(Product product);
+    /*Product updateProduct(Product product);
 
     Product deleteProduct(Long id);*/
 
