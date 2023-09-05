@@ -36,3 +36,16 @@ public class Product {
     private String image;
 
 }
+
+// example of JSON for this class
+// {
+//     "id": 1,
+//     "name": "Product 1",
+//     "description": "Product 1 description",
+//     "price": 100.0,
+//     "category": "Category 1",
+//     "brand": "Brand 1",
+//     "color": "Color 1",
+//     "size": "Size 1",
+//     "image": "Image 1"
+// }
