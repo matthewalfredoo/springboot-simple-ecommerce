@@ -1,4 +1,4 @@
-package com.learning.authservice.config;
+package com.learning.authservice.entity;
 
 import com.learning.authservice.entity.User;
 import org.springframework.security.core.GrantedAuthority;

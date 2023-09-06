@@ -1,9 +1,8 @@
-package com.learning.authservice.config;
+package com.learning.authservice.service;
 
+import com.learning.authservice.entity.CustomUserDetails;
 import com.learning.authservice.entity.User;
 import com.learning.authservice.repository.UserRepository;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
