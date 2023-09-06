@@ -51,6 +51,7 @@ public class ProductController {
             @PathVariable(name = "id")
             Long id,
 
+            @Valid
             @RequestBody
             Product product
     ) {
