@@ -1,6 +1,7 @@
 package com.learning.productservice.service.impl;
 
 import com.learning.productservice.entity.Product;
+import com.learning.productservice.exception.ResourceNotFoundException;
 import com.learning.productservice.repository.ProductRepository;
 import com.learning.productservice.service.ProductService;
 import lombok.AllArgsConstructor;
@@ -28,14 +29,17 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product getProductById(Long id) {
-        //TODO: Handle exception, such as product not found, etc.
-        Product product = productRepository.findById(id).get();
+        Product product = productRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException(Product.class.getSimpleName(), "id", id)
+        );
         return product;
     }
 
     @Override
     public Product updateProduct(Product product) {
-        Product existingProduct = productRepository.findById(product.getId()).get();
+        Product existingProduct = productRepository.findById(product.getId()).orElseThrow(
+                () -> new ResourceNotFoundException(Product.class.getSimpleName(), "id", product.getId())
+        );
 
         existingProduct.setName(product.getName());
         existingProduct.setDescription(product.getDescription());
@@ -53,6 +57,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void deleteProduct(Long id) {
+        productRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException(Product.class.getSimpleName(), "id", id)
+        );
+
         productRepository.deleteById(id);
     }
 

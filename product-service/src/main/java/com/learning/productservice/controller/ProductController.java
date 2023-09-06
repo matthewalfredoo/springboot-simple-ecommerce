@@ -2,6 +2,7 @@ package com.learning.productservice.controller;
 
 import com.learning.productservice.entity.Product;
 import com.learning.productservice.service.ProductService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,7 @@ public class ProductController {
 
     @PostMapping
     public ResponseEntity<Product> saveProduct(
+            @Valid
             @RequestBody
             Product product
     ) {
