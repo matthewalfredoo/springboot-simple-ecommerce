@@ -30,7 +30,8 @@ public class ProductController {
             @RequestBody
             Product product
     ) {
-        product.setId(sequenceGeneratorService.generateSequence(Product.SEQUENCE_NAME));
+        // this is not needed anymore because of the ProductModelListener class //
+        // product.setId(sequenceGeneratorService.generateSequence(Product.SEQUENCE_NAME));
         Product savedProduct = productService.saveProduct(product);
         return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
     }
