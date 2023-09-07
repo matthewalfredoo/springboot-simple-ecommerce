@@ -2,6 +2,7 @@ package com.learning.productservice.controller;
 
 import com.learning.productservice.entity.Product;
 import com.learning.productservice.service.ProductService;
+import com.learning.productservice.service.SequenceGeneratorService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -21,12 +22,15 @@ public class ProductController {
 
     private ProductService productService;
 
+    private SequenceGeneratorService sequenceGeneratorService;
+
     @PostMapping
     public ResponseEntity<Product> saveProduct(
             @Valid
             @RequestBody
             Product product
     ) {
+        product.setId(sequenceGeneratorService.generateSequence(Product.SEQUENCE_NAME));
         Product savedProduct = productService.saveProduct(product);
         return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
     }
