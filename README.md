@@ -19,7 +19,8 @@ Configuration in docker-compose will be made later. For now, let's do everything
 
 * Run docker-compose of kafka in the folder `kafka-stack-docker-compose` (used by `product-service` and `search-service`)
     * `docker-compose -f zk-single-kafka-single.yml up -d`
-    * to stop the containers, run `docker-compose -f zk-single-kafka-single.yml down`
+    * to stop the containers, run `docker-compose -f zk-single-kafka-single.yml stop`
+    * to remove the containers, run `docker-compose -f zk-single-kafka-single.yml down`
 
 
 * Make sure your MongoDB `cluster-product` located in cloud is running. Do this by checking through the web or MongoDB compass. (used by `product-service`)
