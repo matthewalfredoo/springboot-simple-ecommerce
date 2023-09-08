@@ -76,6 +76,14 @@ public class ProductController {
     ) {
         product.setId(id);
         Product updatedProduct = productService.updateProduct(product);
+
+        // send a product updated event to kafka topic
+        ProductEvent productEvent = new ProductEvent();
+        productEvent.setEventId(LocalDateTime.now().toString());
+        productEvent.setEventType(ProductEvent.PRODUCT_UPDATED);
+        productEvent.setProductDto(ProductMapper.toProductDto(updatedProduct));
+        productEventProducer.sendMessage(productEvent);
+
         return new ResponseEntity<>(updatedProduct, HttpStatus.OK);
     }
 
@@ -84,7 +92,18 @@ public class ProductController {
             @PathVariable(name = "id")
             Long id
     ) {
+        // this is needed to send a product deleted event to kafka topic
+        Product deletedProduct = productService.getProductById(id);
+
         productService.deleteProduct(id);
+
+        // send a product deleted event to kafka topic
+        ProductEvent productEvent = new ProductEvent();
+        productEvent.setEventId(LocalDateTime.now().toString());
+        productEvent.setEventType(ProductEvent.PRODUCT_DELETED);
+        productEvent.setProductDto(ProductMapper.toProductDto(deletedProduct));
+        productEventProducer.sendMessage(productEvent);
+
         return new ResponseEntity<String>("Product deleted successfully", HttpStatus.OK);
     }
 
