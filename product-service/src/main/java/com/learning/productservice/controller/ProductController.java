@@ -1,5 +1,6 @@
 package com.learning.productservice.controller;
 
+import com.learning.productservice.dto.ApiResponseDto;
 import com.learning.productservice.dto.ProductEvent;
 import com.learning.productservice.entity.Product;
 import com.learning.productservice.kafka.ProductEventProducer;
@@ -31,7 +32,7 @@ public class ProductController {
     private ProductEventProducer productEventProducer;
 
     @PostMapping
-    public ResponseEntity<Product> saveProduct(
+    public ResponseEntity<ApiResponseDto> saveProduct(
             @Valid
             @RequestBody
             Product product
@@ -47,26 +48,49 @@ public class ProductController {
         productEvent.setProductDto(ProductMapper.toProductDto(savedProduct));
         productEventProducer.sendMessage(productEvent);
 
-        return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
+        // create response with ApiResponseDto
+        ApiResponseDto apiResponseDto = new ApiResponseDto();
+        apiResponseDto.setSuccess(true);
+        apiResponseDto.setMessage("Product saved successfully");
+        apiResponseDto.setTimestamp(System.currentTimeMillis() / 1000);
+        apiResponseDto.setData(savedProduct);
+
+        return new ResponseEntity<>(apiResponseDto, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<Product>> getAllProducts() {
+    public ResponseEntity<ApiResponseDto> getAllProducts() {
         List<Product> products = productService.getAllProducts();
-        return new ResponseEntity<>(products, HttpStatus.OK);
+
+        // create response with ApiResponseDto
+        ApiResponseDto apiResponseDto = new ApiResponseDto();
+        apiResponseDto.setSuccess(true);
+        apiResponseDto.setMessage("Products retrieved successfully");
+        apiResponseDto.setTimestamp(System.currentTimeMillis() / 1000);
+        apiResponseDto.setData(products);
+
+        return new ResponseEntity<>(apiResponseDto, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(
+    public ResponseEntity<ApiResponseDto> getProductById(
             @PathVariable(name = "id")
             Long id
     ) {
         Product product = productService.getProductById(id);
-        return new ResponseEntity<>(product, HttpStatus.OK);
+
+        // create response with ApiResponseDto
+        ApiResponseDto apiResponseDto = new ApiResponseDto();
+        apiResponseDto.setSuccess(true);
+        apiResponseDto.setMessage("Product saved successfully");
+        apiResponseDto.setTimestamp(System.currentTimeMillis() / 1000);
+        apiResponseDto.setData(product);
+
+        return new ResponseEntity<>(apiResponseDto, HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(
+    public ResponseEntity<ApiResponseDto> updateProduct(
             @PathVariable(name = "id")
             Long id,
 
@@ -84,11 +108,18 @@ public class ProductController {
         productEvent.setProductDto(ProductMapper.toProductDto(updatedProduct));
         productEventProducer.sendMessage(productEvent);
 
-        return new ResponseEntity<>(updatedProduct, HttpStatus.OK);
+        // create response with ApiResponseDto
+        ApiResponseDto apiResponseDto = new ApiResponseDto();
+        apiResponseDto.setSuccess(true);
+        apiResponseDto.setMessage("Product updated successfully");
+        apiResponseDto.setTimestamp(System.currentTimeMillis() / 1000);
+        apiResponseDto.setData(updatedProduct);
+
+        return new ResponseEntity<>(apiResponseDto, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteProduct(
+    public ResponseEntity<ApiResponseDto> deleteProduct(
             @PathVariable(name = "id")
             Long id
     ) {
@@ -104,7 +135,13 @@ public class ProductController {
         productEvent.setProductDto(ProductMapper.toProductDto(deletedProduct));
         productEventProducer.sendMessage(productEvent);
 
-        return new ResponseEntity<String>("Product deleted successfully", HttpStatus.OK);
+        // create response with ApiResponseDto
+        ApiResponseDto apiResponseDto = new ApiResponseDto();
+        apiResponseDto.setSuccess(true);
+        apiResponseDto.setMessage("Product deleted successfully");
+        apiResponseDto.setTimestamp(System.currentTimeMillis() / 1000);
+
+        return new ResponseEntity<>(apiResponseDto, HttpStatus.OK);
     }
 
 }

@@ -1,5 +1,6 @@
 package com.learning.productservice.exception;
 
+import com.learning.productservice.dto.ApiResponseDto;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -16,29 +17,29 @@ import java.time.LocalDateTime;
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class)
-    public final ResponseEntity<ErrorDetails> handleAllExceptions(Exception ex, WebRequest webRequest) {
-        ErrorDetails errorDetails = new ErrorDetails(
-                LocalDateTime.now(),
-                ex.getMessage(),
-                webRequest.getDescription(false),
-                "INTERNAL_SERVER_ERROR"
-        );
+    public final ResponseEntity<ApiResponseDto> handleAllExceptions(Exception ex, WebRequest webRequest) {
+        ApiResponseDto apiResponseDto = new ApiResponseDto();
+        apiResponseDto.setSuccess(false);
+        apiResponseDto.setMessage("Something went wrong");
+        apiResponseDto.setPath(webRequest.getDescription(false));
+        apiResponseDto.setTimestamp(System.currentTimeMillis() / 1000);
+        apiResponseDto.setError(ex.getClass().getSimpleName() + ": " + ex.getMessage());
 
-        return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(apiResponseDto, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public final ResponseEntity<ErrorDetails> handleResourceNotFoundException(
+    public final ResponseEntity<ApiResponseDto> handleResourceNotFoundException(
             ResourceNotFoundException exception, WebRequest webRequest
     ) {
-        ErrorDetails errorDetails = new ErrorDetails(
-                LocalDateTime.now(),
-                exception.getMessage(),
-                webRequest.getDescription(false),
-                "PRODUCT_NOT_FOUND"
-        );
+        ApiResponseDto apiResponseDto = new ApiResponseDto();
+        apiResponseDto.setSuccess(false);
+        apiResponseDto.setMessage("Product not found");
+        apiResponseDto.setPath(webRequest.getDescription(false));
+        apiResponseDto.setTimestamp(System.currentTimeMillis() / 1000);
+        apiResponseDto.setError(exception.getClass().getSimpleName() + ": " + exception.getMessage());
 
-        return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(apiResponseDto, HttpStatus.NOT_FOUND);
     }
 
     @Override
