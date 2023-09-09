@@ -19,13 +19,12 @@ public class AuthServiceImpl implements AuthService {
     private JwtService jwtService;
 
     @Override
-    public String saveUser(User user) {
+    public User saveUser(User user) {
         user.setPassword(
                 passwordEncoder.encode(user.getPassword())
         );
 
-        userRepository.save(user);
-        return "User registered successfully";
+        return userRepository.save(user);
     }
 
     @Override

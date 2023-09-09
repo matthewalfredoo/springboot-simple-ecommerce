@@ -4,7 +4,7 @@ import com.learning.authservice.entity.User;
 
 public interface AuthService {
 
-    String saveUser(User user);
+    User saveUser(User user);
 
     String generateToken(String username);
 

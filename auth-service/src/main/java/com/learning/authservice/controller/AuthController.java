@@ -1,8 +1,8 @@
 package com.learning.authservice.controller;
 
-import com.learning.authservice.dto.AuthRequest;
-import com.learning.authservice.dto.LoginResponseDto;
+import com.learning.authservice.dto.*;
 import com.learning.authservice.entity.User;
+import com.learning.authservice.mapper.UserMapper;
 import com.learning.authservice.service.AuthService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,31 +21,46 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
 
     @PostMapping("/register")
-    public String registerUser(
+    public ResponseEntity<ApiResponseDto> registerUser(
             @RequestBody
-            User user
+            AuthRequestDto authRequestDto
     ) {
-        return authService.saveUser(user);
+        User user = UserMapper.toUserFromAuthRequestDto(authRequestDto);
+        User savedUser = authService.saveUser(user);
+
+        UserDto savedUserDto = UserMapper.toUserDtoFromUser(savedUser);
+
+        ApiResponseDto apiResponseDto = new ApiResponseDto();
+        apiResponseDto.setSuccess(true);
+        apiResponseDto.setMessage("User Registered Successfully");
+        apiResponseDto.setTimestamp(System.currentTimeMillis() / 1000);
+        apiResponseDto.setData(savedUserDto);
+
+        return ResponseEntity.ok(apiResponseDto);
     }
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(
             @RequestBody
-            AuthRequest authRequest
+            AuthRequestDto authRequestDto
     ) {
         Authentication authenticate = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        authRequest.getEmail(), authRequest.getPassword()
+                        authRequestDto.getEmail(), authRequestDto.getPassword()
                 )
         );
 
         if(authenticate.isAuthenticated()) {
-            String token = authService.generateToken(authRequest.getEmail());
-            
+            String token = authService.generateToken(authRequestDto.getEmail());
+            User user = authService.getUserByEmail(authRequestDto.getEmail());
+
+            UserDto userDto = UserMapper.toUserDtoFromUser(user);
+
             LoginResponseDto loginResponseDto = new LoginResponseDto();
             loginResponseDto.setSuccess(true);
             loginResponseDto.setMessage("Login Successful");
             loginResponseDto.setTimestamp(System.currentTimeMillis() / 1000);
+            loginResponseDto.setData(userDto);
             loginResponseDto.setToken(token);
 
             return ResponseEntity.ok(loginResponseDto);
