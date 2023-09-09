@@ -17,7 +17,8 @@ Configuration in docker-compose will be made later. For now, let's do everything
     * in case you don't have the container, run `docker run --name kibana --net elastic -p 5601:5601 docker.elastic.co/kibana/kibana:8.9.2`
 
 
-* Run docker-compose of kafka in the folder `kafka-stack-docker-compose` (used by `product-service` and `search-service`)
+* Run docker-compose of kafka in the folder `kafka-stack-docker-compose` (used by `product-service` and `search-service`).
+Refer to [this](https://github.com/conduktor/kafka-stack-docker-compose.git) for more information about the docker compose.
     * `docker-compose -f zk-single-kafka-single.yml up -d`
     * to stop the containers, run `docker-compose -f zk-single-kafka-single.yml stop`
     * to remove the containers, run `docker-compose -f zk-single-kafka-single.yml down`
