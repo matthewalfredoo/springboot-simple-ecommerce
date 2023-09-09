@@ -14,7 +14,7 @@ public class ApiResponseDto {
 
     private boolean success;
     private String message;
-    private Long timestamp;
+    private String timestamp;
 
     @JsonInclude(JsonInclude.Include.NON_NULL) // this will exclude the field if it is null
     private Object data = null;

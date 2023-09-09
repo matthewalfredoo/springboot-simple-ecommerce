@@ -52,7 +52,7 @@ public class ProductController {
         ApiResponseDto apiResponseDto = new ApiResponseDto();
         apiResponseDto.setSuccess(true);
         apiResponseDto.setMessage("Product saved successfully");
-        apiResponseDto.setTimestamp(System.currentTimeMillis() / 1000);
+        apiResponseDto.setTimestamp(LocalDateTime.now().toString());
         apiResponseDto.setData(savedProduct);
 
         return new ResponseEntity<>(apiResponseDto, HttpStatus.CREATED);
@@ -66,7 +66,7 @@ public class ProductController {
         ApiResponseDto apiResponseDto = new ApiResponseDto();
         apiResponseDto.setSuccess(true);
         apiResponseDto.setMessage("Products retrieved successfully");
-        apiResponseDto.setTimestamp(System.currentTimeMillis() / 1000);
+        apiResponseDto.setTimestamp(LocalDateTime.now().toString());
         apiResponseDto.setData(products);
 
         return new ResponseEntity<>(apiResponseDto, HttpStatus.OK);
@@ -83,7 +83,7 @@ public class ProductController {
         ApiResponseDto apiResponseDto = new ApiResponseDto();
         apiResponseDto.setSuccess(true);
         apiResponseDto.setMessage("Product saved successfully");
-        apiResponseDto.setTimestamp(System.currentTimeMillis() / 1000);
+        apiResponseDto.setTimestamp(LocalDateTime.now().toString());
         apiResponseDto.setData(product);
 
         return new ResponseEntity<>(apiResponseDto, HttpStatus.OK);
@@ -112,7 +112,7 @@ public class ProductController {
         ApiResponseDto apiResponseDto = new ApiResponseDto();
         apiResponseDto.setSuccess(true);
         apiResponseDto.setMessage("Product updated successfully");
-        apiResponseDto.setTimestamp(System.currentTimeMillis() / 1000);
+        apiResponseDto.setTimestamp(LocalDateTime.now().toString());
         apiResponseDto.setData(updatedProduct);
 
         return new ResponseEntity<>(apiResponseDto, HttpStatus.OK);
@@ -139,7 +139,7 @@ public class ProductController {
         ApiResponseDto apiResponseDto = new ApiResponseDto();
         apiResponseDto.setSuccess(true);
         apiResponseDto.setMessage("Product deleted successfully");
-        apiResponseDto.setTimestamp(System.currentTimeMillis() / 1000);
+        apiResponseDto.setTimestamp(LocalDateTime.now().toString());
 
         return new ResponseEntity<>(apiResponseDto, HttpStatus.OK);
     }

@@ -11,6 +11,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 /**
  * This class is used to handle the exception thrown by the AuthenticationEntryPoint
@@ -33,7 +34,7 @@ public class CustomAuthenticationEntryPointExceptionHandler implements Authentic
         LoginResponseDto loginResponseDto = new LoginResponseDto();
         loginResponseDto.setSuccess(false);
         loginResponseDto.setMessage("Invalid username or password.");
-        loginResponseDto.setTimestamp(System.currentTimeMillis() / 1000);
+        loginResponseDto.setTimestamp(LocalDateTime.now().toString());
         loginResponseDto.setError(authException.getClass().getSimpleName() + ": " + authException.getMessage());
 
         objectMapper.writeValue(response.getWriter(), loginResponseDto);

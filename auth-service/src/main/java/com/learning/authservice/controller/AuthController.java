@@ -11,6 +11,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+
 @RestController
 @RequestMapping("/api/v1/auth")
 @AllArgsConstructor
@@ -33,7 +35,7 @@ public class AuthController {
         ApiResponseDto apiResponseDto = new ApiResponseDto();
         apiResponseDto.setSuccess(true);
         apiResponseDto.setMessage("User Registered Successfully");
-        apiResponseDto.setTimestamp(System.currentTimeMillis() / 1000);
+        apiResponseDto.setTimestamp(LocalDateTime.now().toString());
         apiResponseDto.setData(savedUserDto);
 
         return ResponseEntity.ok(apiResponseDto);
@@ -59,7 +61,7 @@ public class AuthController {
             LoginResponseDto loginResponseDto = new LoginResponseDto();
             loginResponseDto.setSuccess(true);
             loginResponseDto.setMessage("Login Successful");
-            loginResponseDto.setTimestamp(System.currentTimeMillis() / 1000);
+            loginResponseDto.setTimestamp(LocalDateTime.now().toString());
             loginResponseDto.setData(userDto);
             loginResponseDto.setToken(token);
 

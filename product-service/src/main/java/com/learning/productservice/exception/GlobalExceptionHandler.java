@@ -22,7 +22,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         apiResponseDto.setSuccess(false);
         apiResponseDto.setMessage("Something went wrong");
         apiResponseDto.setPath(webRequest.getDescription(false));
-        apiResponseDto.setTimestamp(System.currentTimeMillis() / 1000);
+        apiResponseDto.setTimestamp(LocalDateTime.now().toString());
         apiResponseDto.setError(ex.getClass().getSimpleName() + ": " + ex.getMessage());
 
         return new ResponseEntity<>(apiResponseDto, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -36,7 +36,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         apiResponseDto.setSuccess(false);
         apiResponseDto.setMessage("Product not found");
         apiResponseDto.setPath(webRequest.getDescription(false));
-        apiResponseDto.setTimestamp(System.currentTimeMillis() / 1000);
+        apiResponseDto.setTimestamp(LocalDateTime.now().toString());
         apiResponseDto.setError(exception.getClass().getSimpleName() + ": " + exception.getMessage());
 
         return new ResponseEntity<>(apiResponseDto, HttpStatus.NOT_FOUND);
