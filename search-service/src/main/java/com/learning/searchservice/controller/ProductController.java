@@ -64,4 +64,33 @@ public class ProductController {
         return new ResponseEntity<String>("Product deleted successfully", HttpStatus.OK);
     }
 
+    @GetMapping("/name/{name}")
+    public ResponseEntity<Iterable<Product>> findProductsByName(
+            @PathVariable(name = "name")
+            String name
+    ) {
+        Iterable<Product> products = productService.findProductsByName(name);
+        return new ResponseEntity<>(products, HttpStatus.OK);
+    }
+
+    @GetMapping("/price-between/{minPrice}/{maxPrice}")
+    public ResponseEntity<Iterable<Product>> findProductsByPriceBetween(
+            @PathVariable(name = "minPrice")
+            Double minPrice,
+            @PathVariable(name = "maxPrice")
+            Double maxPrice
+    ) {
+        Iterable<Product> products = productService.findProductsByPriceBetween(minPrice, maxPrice);
+        return new ResponseEntity<>(products, HttpStatus.OK);
+    }
+
+    @GetMapping("/category/{category}")
+    public ResponseEntity<Iterable<Product>> findProductsByCategory(
+            @PathVariable(name = "category")
+            String category
+    ) {
+        Iterable<Product> products = productService.findProductsByCategory(category);
+        return new ResponseEntity<>(products, HttpStatus.OK);
+    }
+
 }

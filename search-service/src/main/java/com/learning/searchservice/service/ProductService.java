@@ -14,6 +14,10 @@ public interface ProductService {
 
     void deleteProduct(Long id);
 
-    Iterable<Product> searchProducts(String query);
+    Iterable<Product> findProductsByName(String searchKeyword);
+
+    Iterable<Product> findProductsByPriceBetween(Double minPrice, Double maxPrice);
+
+    Iterable<Product> findProductsByCategory(String searchKeyword);
 
 }
