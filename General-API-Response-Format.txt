@@ -1,0 +1,14 @@
+{
+    "success": true,
+    "message": "Some message",
+    "timestamp": 1623024000,
+    "data": {
+        "id": 1,
+        "name": "Some name",
+        "email": "email@email.com"
+    },
+    "error" (nullable): {
+
+    },
+    "token" (conditional, when login): "some.jwt.token"
+}
