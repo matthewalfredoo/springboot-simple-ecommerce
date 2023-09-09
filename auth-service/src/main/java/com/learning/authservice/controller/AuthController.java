@@ -1,9 +1,11 @@
 package com.learning.authservice.controller;
 
 import com.learning.authservice.dto.AuthRequest;
+import com.learning.authservice.dto.LoginResponseDto;
 import com.learning.authservice.entity.User;
 import com.learning.authservice.service.AuthService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -27,7 +29,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String login(
+    public ResponseEntity<LoginResponseDto> login(
             @RequestBody
             AuthRequest authRequest
     ) {
@@ -38,7 +40,15 @@ public class AuthController {
         );
 
         if(authenticate.isAuthenticated()) {
-            return authService.generateToken(authRequest.getEmail());
+            String token = authService.generateToken(authRequest.getEmail());
+            
+            LoginResponseDto loginResponseDto = new LoginResponseDto();
+            loginResponseDto.setSuccess(true);
+            loginResponseDto.setMessage("Login Successful");
+            loginResponseDto.setTimestamp(System.currentTimeMillis() / 1000);
+            loginResponseDto.setToken(token);
+
+            return ResponseEntity.ok(loginResponseDto);
         } else{
             throw new RuntimeException("Authentication Failed");
         }
