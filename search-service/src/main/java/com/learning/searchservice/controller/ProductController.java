@@ -93,4 +93,13 @@ public class ProductController {
         return new ResponseEntity<>(products, HttpStatus.OK);
     }
 
+    @GetMapping("/suggestions/{searchKeyword}")
+    public ResponseEntity<Iterable<String>> fetchSuggestions(
+            @PathVariable(name = "searchKeyword")
+            String searchKeyword
+    ) {
+        Iterable<String> suggestions = productService.fetchSuggestions(searchKeyword);
+        return new ResponseEntity<>(suggestions, HttpStatus.OK);
+    }
+
 }

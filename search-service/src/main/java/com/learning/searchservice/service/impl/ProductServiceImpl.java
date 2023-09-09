@@ -90,4 +90,22 @@ public class ProductServiceImpl implements ProductService {
         return searchHits.stream().map(SearchHit::getContent).collect(Collectors.toList());
     }
 
+    @Override
+    public Iterable<String> fetchSuggestions(String searchKeyword) {
+        String lowercaseSearchKeyword = searchKeyword.toLowerCase();
+
+        Criteria criteria = new Criteria("name").contains(lowercaseSearchKeyword);
+        Query query = new CriteriaQuery(criteria);
+
+        NativeQuery nativeQuery = NativeQuery.builder()
+                .withQuery(query)
+                .build();
+
+        SearchHits<Product> searchHits = operations.search(nativeQuery, Product.class);
+
+        return searchHits.stream().map(productSearchHit -> {
+            return productSearchHit.getContent().getName();
+        }).collect(Collectors.toList());
+    }
+
 }

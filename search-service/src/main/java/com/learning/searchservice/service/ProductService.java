@@ -20,4 +20,6 @@ public interface ProductService {
 
     Iterable<Product> findProductsByCategory(String searchKeyword);
 
+    Iterable<String> fetchSuggestions(String searchKeyword);
+
 }
