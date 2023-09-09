@@ -33,7 +33,12 @@ public class WebSecurityConfig {
         // 3. Enabling CSRF check will impact POST and PUT requests. Disable it
         http.csrf(csrf -> csrf.disable());
 
+
         http.exceptionHandling(httpSecurityExceptionHandlingConfigurer -> {
+            // this will handle the exception when the user is not authenticated
+            // or when user's email and password combination is wrong
+            // here is a reference why we do this
+            // https://stackoverflow.com/questions/62292243/return-custom-spring-security-message-from-rest-api
             httpSecurityExceptionHandlingConfigurer.authenticationEntryPoint(authenticationEntryPoint);
         });
 

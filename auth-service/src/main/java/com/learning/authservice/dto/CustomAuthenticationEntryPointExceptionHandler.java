@@ -12,13 +12,16 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+/**
+ * This class is used to handle the exception thrown by the AuthenticationEntryPoint
+ */
 @Component
-public class CustomAuthenticationFailureHandler implements AuthenticationEntryPoint {
+public class CustomAuthenticationEntryPointExceptionHandler implements AuthenticationEntryPoint {
 
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public CustomAuthenticationFailureHandler(ObjectMapper objectMapper) {
+    public CustomAuthenticationEntryPointExceptionHandler(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
@@ -29,7 +32,7 @@ public class CustomAuthenticationFailureHandler implements AuthenticationEntryPo
 
         LoginResponseDto loginResponseDto = new LoginResponseDto();
         loginResponseDto.setSuccess(false);
-        loginResponseDto.setMessage("Invalid username or password man.");
+        loginResponseDto.setMessage("Invalid username or password.");
         loginResponseDto.setTimestamp(System.currentTimeMillis() / 1000);
         loginResponseDto.setError(authException.getClass().getSimpleName() + ": " + authException.getMessage());
 
