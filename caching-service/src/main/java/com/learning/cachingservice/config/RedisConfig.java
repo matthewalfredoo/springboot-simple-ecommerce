@@ -21,4 +21,11 @@ public class RedisConfig {
         return redisTemplate;
     }
 
+    @Bean
+    public RedisTemplate<String, String> getRedisTemplateApiResponse() {
+        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(getConnectionFactory());
+        return redisTemplate;
+    }
+
 }
