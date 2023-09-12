@@ -9,6 +9,7 @@ import com.learning.productservice.entity.Product;
 import com.learning.productservice.kafka.ApiResponseJsonCacheProducer;
 import com.learning.productservice.kafka.ProductEventProducer;
 import com.learning.productservice.mapper.ProductMapper;
+import com.learning.productservice.proxy.CachingServiceProxy;
 import com.learning.productservice.service.ProductService;
 import com.learning.productservice.service.SequenceGeneratorService;
 import jakarta.validation.Valid;
@@ -36,6 +37,8 @@ public class ProductController {
     private ProductEventProducer productEventProducer;
 
     private ApiResponseJsonCacheProducer apiResponseJsonCacheProducer;
+
+    private CachingServiceProxy cachingServiceProxy;
 
     private final ObjectMapper objectMapper;
 
@@ -68,6 +71,17 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<ApiResponseDto> getAllProducts() {
+        String apiResponseJson = cachingServiceProxy.getApiResponseJson("/api/v1/products");
+        if(apiResponseJson != null) {
+            try {
+                ApiResponseDto apiResponseDto = objectMapper.readValue(apiResponseJson, ApiResponseDto.class);
+                LOGGER.info("Retrieved all products from cache");
+                return new ResponseEntity<>(apiResponseDto, HttpStatus.OK);
+            } catch (JsonProcessingException e) {
+                LOGGER.error(e.getMessage());
+            }
+        }
+
         List<Product> products = productService.getAllProducts();
 
         // create response with ApiResponseDto
@@ -92,6 +106,8 @@ public class ProductController {
             LOGGER.error(e.getMessage());
         }
 
+        LOGGER.info("Retrieved all products from database");
+
         return new ResponseEntity<>(apiResponseDto, HttpStatus.OK);
     }
 
@@ -100,6 +116,18 @@ public class ProductController {
             @PathVariable(name = "id")
             Long id
     ) {
+        String apiResponseJson = cachingServiceProxy.getApiResponseJson("/api/v1/products/" + id);
+        if(apiResponseJson != null) {
+            try {
+                ApiResponseDto apiResponseDto = objectMapper.readValue(apiResponseJson, ApiResponseDto.class);
+                LOGGER.info("Retrieved product by id from cache");
+                return new ResponseEntity<>(apiResponseDto, HttpStatus.OK);
+            } catch (JsonProcessingException e) {
+                LOGGER.error(e.getMessage());
+            }
+        }
+
+
         Product product = productService.getProductById(id);
 
         // create response with ApiResponseDto
@@ -108,6 +136,23 @@ public class ProductController {
         apiResponseDto.setMessage("Product saved successfully");
         apiResponseDto.setTimestamp(LocalDateTime.now().toString());
         apiResponseDto.setData(product);
+
+        // send an API response JSON cache event to kafka topic
+        try{
+            ApiResponseJsonCacheEvent apiResponseJsonCacheEvent = new ApiResponseJsonCacheEvent();
+            apiResponseJsonCacheEvent.setEventId(LocalDateTime.now().toString());
+            apiResponseJsonCacheEvent.setEventType(ApiResponseJsonCacheEvent.EVENT_TYPE_CREATE);
+            apiResponseJsonCacheEvent.setKey("/api/v1/products/" + id);
+            apiResponseJsonCacheEvent.setValue(
+                    objectMapper.writeValueAsString(apiResponseDto)
+            );
+
+            apiResponseJsonCacheProducer.sendMessage(apiResponseJsonCacheEvent);
+        } catch (JsonProcessingException e) {
+            LOGGER.error(e.getMessage());
+        }
+
+        LOGGER.info("Retrieved product by id from database");
 
         return new ResponseEntity<>(apiResponseDto, HttpStatus.OK);
     }
