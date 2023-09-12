@@ -1,6 +1,7 @@
 package com.learning.productservice.kafka;
 
 import com.learning.productservice.dto.ProductEvent;
+import jakarta.annotation.Resource;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,7 @@ public class ProductEventProducer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProductEventProducer.class);
 
+    @Resource(name = "topicProduct")
     private NewTopic topicProduct;
 
     private KafkaTemplate<String, ProductEvent> kafkaTemplate;

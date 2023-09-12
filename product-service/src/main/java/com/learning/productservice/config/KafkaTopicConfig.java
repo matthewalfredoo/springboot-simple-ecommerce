@@ -12,9 +12,18 @@ public class KafkaTopicConfig {
     @Value("${kafka.topic.product}")
     private String topicProduct;
 
+    @Value("${kafka.topic.api-response-json-cache}")
+    private String topicApiResponseJsonCache;
+
     @Bean
     public NewTopic topicProduct() {
         return TopicBuilder.name(topicProduct)
+                .build();
+    }
+
+    @Bean
+    public NewTopic topicApiResponseJsonCache() {
+        return TopicBuilder.name(topicApiResponseJsonCache)
                 .build();
     }
 

@@ -1,8 +1,12 @@
 package com.learning.productservice.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.learning.productservice.dto.ApiResponseDto;
+import com.learning.productservice.dto.ApiResponseJsonCacheEvent;
 import com.learning.productservice.dto.ProductEvent;
 import com.learning.productservice.entity.Product;
+import com.learning.productservice.kafka.ApiResponseJsonCacheProducer;
 import com.learning.productservice.kafka.ProductEventProducer;
 import com.learning.productservice.mapper.ProductMapper;
 import com.learning.productservice.service.ProductService;
@@ -30,6 +34,10 @@ public class ProductController {
     private SequenceGeneratorService sequenceGeneratorService;
 
     private ProductEventProducer productEventProducer;
+
+    private ApiResponseJsonCacheProducer apiResponseJsonCacheProducer;
+
+    private final ObjectMapper objectMapper;
 
     @PostMapping
     public ResponseEntity<ApiResponseDto> saveProduct(
@@ -68,6 +76,21 @@ public class ProductController {
         apiResponseDto.setMessage("Products retrieved successfully");
         apiResponseDto.setTimestamp(LocalDateTime.now().toString());
         apiResponseDto.setData(products);
+
+        // send an API response JSON cache event to kafka topic
+        try{
+            ApiResponseJsonCacheEvent apiResponseJsonCacheEvent = new ApiResponseJsonCacheEvent();
+            apiResponseJsonCacheEvent.setEventId(LocalDateTime.now().toString());
+            apiResponseJsonCacheEvent.setEventType(ApiResponseJsonCacheEvent.EVENT_TYPE_CREATE);
+            apiResponseJsonCacheEvent.setKey("/api/v1/products");
+            apiResponseJsonCacheEvent.setValue(
+                    objectMapper.writeValueAsString(apiResponseDto)
+            );
+
+            apiResponseJsonCacheProducer.sendMessage(apiResponseJsonCacheEvent);
+        } catch (JsonProcessingException e) {
+            LOGGER.error(e.getMessage());
+        }
 
         return new ResponseEntity<>(apiResponseDto, HttpStatus.OK);
     }
