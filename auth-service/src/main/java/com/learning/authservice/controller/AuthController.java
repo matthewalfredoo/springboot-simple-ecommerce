@@ -73,19 +73,39 @@ public class AuthController {
     }
 
     @GetMapping("/user/{id}")
-    public User getUserById(
+    public ApiResponseDto getUserById(
             @PathVariable(name = "id")
             Long id
     ) {
-        return authService.getUserById(id);
+        User user = authService.getUserById(id);
+
+        UserDto userDto = UserMapper.toUserDtoFromUser(user);
+
+        ApiResponseDto apiResponseDto = new ApiResponseDto();
+        apiResponseDto.setSuccess(true);
+        apiResponseDto.setMessage("User Fetched Successfully");
+        apiResponseDto.setTimestamp(LocalDateTime.now().toString());
+        apiResponseDto.setData(userDto);
+
+        return apiResponseDto;
     }
 
     @GetMapping("/user/{email}")
-    public User getUserByEmail(
+    public ApiResponseDto getUserByEmail(
             @PathVariable(name = "email")
             String email
     ) {
-        return authService.getUserByEmail(email);
+        User user = authService.getUserByEmail(email);
+
+        UserDto userDto = UserMapper.toUserDtoFromUser(user);
+
+        ApiResponseDto apiResponseDto = new ApiResponseDto();
+        apiResponseDto.setSuccess(true);
+        apiResponseDto.setMessage("User Fetched Successfully");
+        apiResponseDto.setTimestamp(LocalDateTime.now().toString());
+        apiResponseDto.setData(userDto);
+
+        return apiResponseDto;
     }
 
     @GetMapping("/validate")
