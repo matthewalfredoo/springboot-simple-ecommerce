@@ -72,7 +72,7 @@ public class AuthController {
         }
     }
 
-    @GetMapping("/user/{id}")
+    @GetMapping("/user/id/{id}")
     public ApiResponseDto getUserById(
             @PathVariable(name = "id")
             Long id
@@ -90,7 +90,7 @@ public class AuthController {
         return apiResponseDto;
     }
 
-    @GetMapping("/user/{email}")
+    @GetMapping("/user/email/{email}")
     public ApiResponseDto getUserByEmail(
             @PathVariable(name = "email")
             String email
