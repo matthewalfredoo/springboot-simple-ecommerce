@@ -15,26 +15,49 @@ import java.time.LocalDateTime;
 public class Order {
 
     @Id
-    String id;
+    private String id;
 
-    Long productId;
+    private Long productId;
 
-    int quantity;
+    private int quantity;
 
-    Double price;
+    private Double price;
 
-    Double deliveryPrice;
+    private Double deliveryPrice;
 
-    Double discountPrice;
+    private Double discountPrice;
 
-    Double insurancePrice;
+    private Double insurancePrice;
 
-    Long userId;
+    private Long userId;
 
-    String address;
+    private String address;
 
-    String status;
+    private String status;
 
-    LocalDateTime date;
+    private LocalDateTime date;
+
+    public static final String STATUS_CREATED = "CREATED";
+    public static final String STATUS_CONFIRMED = "CONFIRMED";
+    public static final String STATUS_PACKED = "PACKED";
+    public static final String STATUS_SHIPPED = "SHIPPED";
+    public static final String STATUS_DELIVERED = "DELIVERED";
+    public static final String STATUS_COMPLETED = "COMPLETED";
+    public static final String STATUS_CANCELLED = "CANCELLED";
 
 }
+
+// The data in JSON format for the above entity is as follows:
+//{
+//    "id": "1",
+//    "productId": 1,
+//    "quantity": 1,
+//    "price": 100.0,
+//    "deliveryPrice": 10.0,
+//    "discountPrice": 0.0,
+//    "insurancePrice": 0.0,
+//    "userId": 1,
+//    "address": "Address 1",
+//    "status": "CREATED",
+//    "date": "2021-08-01T00:00:00"
+//}
