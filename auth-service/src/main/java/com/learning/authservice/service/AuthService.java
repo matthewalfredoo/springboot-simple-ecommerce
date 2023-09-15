@@ -10,6 +10,8 @@ public interface AuthService {
 
     void validateToken(String token);
 
+    User getUserById(Long id);
+
     User getUserByEmail(String email);
 
 }

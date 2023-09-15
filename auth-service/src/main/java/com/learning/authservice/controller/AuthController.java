@@ -72,6 +72,14 @@ public class AuthController {
         }
     }
 
+    @GetMapping("/user/{id}")
+    public User getUserById(
+            @PathVariable(name = "id")
+            Long id
+    ) {
+        return authService.getUserById(id);
+    }
+
     @GetMapping("/user/{email}")
     public User getUserByEmail(
             @PathVariable(name = "email")
