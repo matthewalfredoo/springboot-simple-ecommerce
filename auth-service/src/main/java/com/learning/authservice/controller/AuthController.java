@@ -53,8 +53,9 @@ public class AuthController {
         );
 
         if(authenticate.isAuthenticated()) {
-            String token = authService.generateToken(authRequestDto.getEmail());
             User user = authService.getUserByEmail(authRequestDto.getEmail());
+
+            String token = authService.generateToken(user.getId(), authRequestDto.getEmail());
 
             UserDto userDto = UserMapper.toUserDtoFromUser(user);
 

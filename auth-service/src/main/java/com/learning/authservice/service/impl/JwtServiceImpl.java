@@ -29,16 +29,18 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public String generateToken(String username) {
+    public String generateToken(Long id, String username) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, username);
+        return createToken(claims, id, username);
     }
 
     @Override
-    public String createToken(Map<String, Object> claims, String username) {
+    public String createToken(Map<String, Object> claims, Long id, String username) {
+        claims.put("email", username);
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(username)
+                // .setSubject(username)
+                .setSubject(id.toString())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(
                         new Date(System.currentTimeMillis() + 1000 * 60 * 30)
