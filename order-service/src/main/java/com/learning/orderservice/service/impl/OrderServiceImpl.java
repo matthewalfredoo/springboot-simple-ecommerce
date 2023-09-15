@@ -18,11 +18,11 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order saveOrder(Order order) {
-        String orderId = "ORDER-" + LocalDate.now() + "-" + order.getUserId() + "-" + order.getProductId() + "-" + orderRepository.count() + 1;
+        String orderId = "ORDER-" + LocalDate.now() + "-" + order.getUserId() + "-" + order.getProductId() + "-" + orderRepository.count();
         LocalDateTime now = LocalDateTime.now();
         order.setId(orderId);
         order.setDate(now);
-        order.setStatus("CREATED");
+        order.setStatus(Order.STATUS_CREATED);
         return orderRepository.save(order);
     }
 
