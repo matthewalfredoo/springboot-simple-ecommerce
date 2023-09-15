@@ -2,9 +2,9 @@ package com.learning.orderservice.controller;
 
 import com.learning.orderservice.dto.ApiResponseDto;
 import com.learning.orderservice.dto.OrderDto;
-import com.learning.orderservice.dto.ProductDto;
 import com.learning.orderservice.entity.Order;
 import com.learning.orderservice.mapper.OrderMapper;
+import com.learning.orderservice.proxy.AuthServiceProxy;
 import com.learning.orderservice.proxy.ProductServiceProxy;
 import com.learning.orderservice.service.JwtService;
 import com.learning.orderservice.service.OrderService;
@@ -33,6 +33,8 @@ public class OrderController {
 
     private JwtService jwtService;
 
+    private AuthServiceProxy authServiceProxy;
+
     private ProductServiceProxy productServiceProxy;
 
     @PostMapping
@@ -52,28 +54,45 @@ public class OrderController {
         order.setUserId(Long.parseLong(userId));
 
         // get the user's address for future reference, in case the address changes
-        // dummy address for now
-        order.setAddress("123 Main St, New York, NY 10030");
+        ResponseEntity<ApiResponseDto> responseEntityUserById = authServiceProxy.getUserById(order.getUserId());
+        ApiResponseDto apiResponseDtoUserById = responseEntityUserById.getBody();
 
-        // get the product's current price for future reference, in case the price changes
-        ResponseEntity<ApiResponseDto> responseEntity = productServiceProxy.getProductById(order.getProductId());
-        ApiResponseDto apiResponseDtoProductById = responseEntity.getBody();
-
-        // if the product service is down, return a fallback response from ProductServiceProxyFallback
-        if(apiResponseDtoProductById == null) {
-            return responseEntity;
+        // if the auth service is down, return a fallback response from AuthServiceProxyFallback
+        if(apiResponseDtoUserById == null) {
+            return responseEntityUserById;
         }
 
         // TODO if is not successful, should return ResourceNotFoundException
-        if(!apiResponseDtoProductById.isSuccess() && responseEntity.getStatusCode() != HttpStatus.OK) {
-            return responseEntity;
+        if(!apiResponseDtoUserById.isSuccess() && responseEntityUserById.getStatusCode() != HttpStatus.OK) {
+            return responseEntityUserById;
+        }
+
+        // if the auth service is up, get the user's address
+        if(apiResponseDtoUserById.getData() instanceof LinkedHashMap) {
+            LinkedHashMap<String, Object> userDtoMap = (LinkedHashMap<String, Object>) apiResponseDtoUserById.getData();
+
+            order.setAddress(
+                    userDtoMap.get("address").toString()
+            );
+        }
+
+        // get the product's current price for future reference, in case the price changes
+        ResponseEntity<ApiResponseDto> responseEntityProductById = productServiceProxy.getProductById(order.getProductId());
+        ApiResponseDto apiResponseDtoProductById = responseEntityProductById.getBody();
+
+        // if the product service is down, return a fallback response from ProductServiceProxyFallback
+        if(apiResponseDtoProductById == null) {
+            return responseEntityProductById;
+        }
+
+        // TODO if is not successful, should return ResourceNotFoundException
+        if(!apiResponseDtoProductById.isSuccess() && responseEntityProductById.getStatusCode() != HttpStatus.OK) {
+            return responseEntityProductById;
         }
 
         // if the product service is up, get the product's current price
         if(apiResponseDtoProductById.getData() instanceof LinkedHashMap) {
             LinkedHashMap<String, Object> productDtoMap = (LinkedHashMap<String, Object>) apiResponseDtoProductById.getData();
-
-            LOGGER.info("productDtoMap: {}", productDtoMap);
 
             order.setPrice(
                     Double.parseDouble(productDtoMap.get("price").toString())

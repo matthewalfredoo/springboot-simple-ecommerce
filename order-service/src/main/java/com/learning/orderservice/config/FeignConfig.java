@@ -1,5 +1,6 @@
 package com.learning.orderservice.config;
 
+import com.learning.orderservice.proxy.AuthServiceProxy;
 import com.learning.orderservice.proxy.ProductServiceProxy;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JCircuitBreakerFactory;
@@ -24,7 +25,7 @@ public class FeignConfig {
                 .build();
 
         return resilience4JCircuitBreakerFactory -> resilience4JCircuitBreakerFactory.configure(builder ->
-                builder.circuitBreakerConfig(circuitBreakerConfig), ProductServiceProxy.FEIGN_CLIENT_NAME
+                builder.circuitBreakerConfig(circuitBreakerConfig), ProductServiceProxy.FEIGN_CLIENT_NAME, AuthServiceProxy.FEIGN_CLIENT_NAME
         );
     }
 
