@@ -29,6 +29,11 @@ Refer to [this](https://github.com/conduktor/kafka-stack-docker-compose.git) for
     * to remove the containers, run `docker-compose -f zk-single-kafka-single.yml down`
 
 
+* Run the existing container of MySQL (used by `order-service`)
+    * `docker start mysql`
+    * in case you don't have the container, run `docker run --name mysql -e MYSQL_ROOT_PASSWORD=12345678 -e MYSQL_DATABASE=db_order -e MYSQL_USER=user -e MYSQL_PASSWORD=12345678 -p 3306:3306 -d mysql:8.1.0`
+
+
 * Make sure your MongoDB `cluster-product` located in cloud is running. Do this by checking through the web or MongoDB compass. (used by `product-service`)
 
 
@@ -39,6 +44,7 @@ Refer to [this](https://github.com/conduktor/kafka-stack-docker-compose.git) for
     * `service-registry` at port `8761`
     * `auth-service` at port `8100`
     * `product-service` at port `8090`
+    * `order-service` at port `8130`
     * `search-service` at port `8110`
     * `caching-service` at port `8120
     * `api-gateway` at port `8080`
@@ -48,6 +54,7 @@ Refer to [this](https://github.com/conduktor/kafka-stack-docker-compose.git) for
     * `http://localhost:8761/` for `service-registry` and access the Eureka dashboard
     * `http://localhost:8100/` for `auth-service`
     * `http://localhost:8090/` for `product-service`
+    * `http://localhost:8130/` for `order-service`
     * `http://localhost:8110/` for `search-service`
     * `http://localhost:8120/` for `caching-service`
     * `http://localhost:8080/` for `api-gateway`
