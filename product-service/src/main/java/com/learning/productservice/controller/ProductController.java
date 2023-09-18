@@ -10,8 +10,11 @@ import com.learning.productservice.kafka.ApiResponseJsonCacheProducer;
 import com.learning.productservice.kafka.ProductEventProducer;
 import com.learning.productservice.mapper.ProductMapper;
 import com.learning.productservice.proxy.CachingServiceProxy;
+import com.learning.productservice.service.JwtService;
 import com.learning.productservice.service.ProductService;
 import com.learning.productservice.service.SequenceGeneratorService;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -42,12 +45,38 @@ public class ProductController {
 
     private final ObjectMapper objectMapper;
 
+    private final JwtService jwtService;
+
+    // Helper method to check if the user has the "Admin" role
+    private boolean hasAdminRole(String token) {
+        // extract roles from the JWT token and perform the check here
+        // Return true if the user has the "admin" role, false otherwise
+        Jws<Claims> claimsJws = jwtService.validateToken(token);
+        String roles = claimsJws.getBody().get("role", String.class);
+        roles = roles.toLowerCase();
+        return roles.contains("admin");
+    }
+
     @PostMapping
     public ResponseEntity<ApiResponseDto> saveProduct(
             @Valid
             @RequestBody
-            Product product
+            Product product,
+
+            @RequestHeader(name = "Authorization")
+            String token
     ) {
+        // check if the user has the "Admin" role
+        if(!hasAdminRole(token)) {
+            // create response with ApiResponseDto
+            ApiResponseDto apiResponseDto = new ApiResponseDto();
+            apiResponseDto.setSuccess(false);
+            apiResponseDto.setMessage("You are not authorized to perform this operation");
+            apiResponseDto.setTimestamp(LocalDateTime.now().toString());
+
+            return new ResponseEntity<>(apiResponseDto, HttpStatus.UNAUTHORIZED);
+        }
+
         // this is not needed anymore because of the ProductModelListener class //
         // product.setId(sequenceGeneratorService.generateSequence(Product.SEQUENCE_NAME));
         Product savedProduct = productService.saveProduct(product);
@@ -164,8 +193,21 @@ public class ProductController {
 
             @Valid
             @RequestBody
-            Product product
+            Product product,
+
+            @RequestHeader(name = "Authorization")
+            String token
     ) {
+        if(!hasAdminRole(token)) {
+            // create response with ApiResponseDto
+            ApiResponseDto apiResponseDto = new ApiResponseDto();
+            apiResponseDto.setSuccess(false);
+            apiResponseDto.setMessage("You are not authorized to perform this operation");
+            apiResponseDto.setTimestamp(LocalDateTime.now().toString());
+
+            return new ResponseEntity<>(apiResponseDto, HttpStatus.UNAUTHORIZED);
+        }
+
         product.setId(id);
         Product updatedProduct = productService.updateProduct(product);
 
@@ -189,8 +231,21 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponseDto> deleteProduct(
             @PathVariable(name = "id")
-            Long id
+            Long id,
+
+            @RequestHeader(name = "Authorization")
+            String token
     ) {
+        if(!hasAdminRole(token)) {
+            // create response with ApiResponseDto
+            ApiResponseDto apiResponseDto = new ApiResponseDto();
+            apiResponseDto.setSuccess(false);
+            apiResponseDto.setMessage("You are not authorized to perform this operation");
+            apiResponseDto.setTimestamp(LocalDateTime.now().toString());
+
+            return new ResponseEntity<>(apiResponseDto, HttpStatus.UNAUTHORIZED);
+        }
+
         // this is needed to send a product deleted event to kafka topic
         Product deletedProduct = productService.getProductById(id);
 
