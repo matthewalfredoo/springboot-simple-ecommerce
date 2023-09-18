@@ -37,6 +37,7 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public String createToken(Map<String, Object> claims, Long id, String username, String role) {
         claims.put("email", username);
+        claims.put("role", role);
         return Jwts.builder()
                 .setClaims(claims)
                 // .setSubject(username)
