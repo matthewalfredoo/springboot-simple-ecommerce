@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -57,6 +58,23 @@ public class ProductController {
         return roles.contains("admin");
     }
 
+    @Nullable
+    private ResponseEntity<ApiResponseDto> getApiResponseDtoResponseEntity(
+            @RequestHeader(name = "Authorization")
+            String token
+    ) {
+        if(!hasAdminRole(token)) {
+            // create response with ApiResponseDto
+            ApiResponseDto apiResponseDto = new ApiResponseDto();
+            apiResponseDto.setSuccess(false);
+            apiResponseDto.setMessage("You are not authorized to perform this operation");
+            apiResponseDto.setTimestamp(LocalDateTime.now().toString());
+
+            return new ResponseEntity<>(apiResponseDto, HttpStatus.UNAUTHORIZED);
+        }
+        return null;
+    }
+
     @PostMapping
     public ResponseEntity<ApiResponseDto> saveProduct(
             @Valid
@@ -67,15 +85,8 @@ public class ProductController {
             String token
     ) {
         // check if the user has the "Admin" role
-        if(!hasAdminRole(token)) {
-            // create response with ApiResponseDto
-            ApiResponseDto apiResponseDto = new ApiResponseDto();
-            apiResponseDto.setSuccess(false);
-            apiResponseDto.setMessage("You are not authorized to perform this operation");
-            apiResponseDto.setTimestamp(LocalDateTime.now().toString());
-
-            return new ResponseEntity<>(apiResponseDto, HttpStatus.UNAUTHORIZED);
-        }
+        ResponseEntity<ApiResponseDto> apiResponseDtoToken = getApiResponseDtoResponseEntity(token);
+        if (apiResponseDtoToken != null) return apiResponseDtoToken;
 
         // this is not needed anymore because of the ProductModelListener class //
         // product.setId(sequenceGeneratorService.generateSequence(Product.SEQUENCE_NAME));
@@ -198,15 +209,8 @@ public class ProductController {
             @RequestHeader(name = "Authorization")
             String token
     ) {
-        if(!hasAdminRole(token)) {
-            // create response with ApiResponseDto
-            ApiResponseDto apiResponseDto = new ApiResponseDto();
-            apiResponseDto.setSuccess(false);
-            apiResponseDto.setMessage("You are not authorized to perform this operation");
-            apiResponseDto.setTimestamp(LocalDateTime.now().toString());
-
-            return new ResponseEntity<>(apiResponseDto, HttpStatus.UNAUTHORIZED);
-        }
+        ResponseEntity<ApiResponseDto> apiResponseDtoToken = getApiResponseDtoResponseEntity(token);
+        if (apiResponseDtoToken != null) return apiResponseDtoToken;
 
         product.setId(id);
         Product updatedProduct = productService.updateProduct(product);
@@ -236,15 +240,8 @@ public class ProductController {
             @RequestHeader(name = "Authorization")
             String token
     ) {
-        if(!hasAdminRole(token)) {
-            // create response with ApiResponseDto
-            ApiResponseDto apiResponseDto = new ApiResponseDto();
-            apiResponseDto.setSuccess(false);
-            apiResponseDto.setMessage("You are not authorized to perform this operation");
-            apiResponseDto.setTimestamp(LocalDateTime.now().toString());
-
-            return new ResponseEntity<>(apiResponseDto, HttpStatus.UNAUTHORIZED);
-        }
+        ResponseEntity<ApiResponseDto> apiResponseDtoToken = getApiResponseDtoResponseEntity(token);
+        if (apiResponseDtoToken != null) return apiResponseDtoToken;
 
         // this is needed to send a product deleted event to kafka topic
         Product deletedProduct = productService.getProductById(id);
