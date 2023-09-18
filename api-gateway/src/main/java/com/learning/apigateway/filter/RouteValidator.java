@@ -12,6 +12,10 @@ import java.util.function.Predicate;
 @Component
 public class RouteValidator {
 
+    // this is a map of open api endpoints and their allowed methods
+    // this is used to check if the request is coming from an open api endpoint
+    // if it is, then we don't need to validate the token
+    // if it is not, then we need to validate the token
     private static final Map<String, Set<HttpMethod>> openApiEndpoints = Map.of(
             // endpoint, methods
 
