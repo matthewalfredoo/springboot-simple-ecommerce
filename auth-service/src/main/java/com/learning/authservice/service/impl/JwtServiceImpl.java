@@ -29,13 +29,13 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public String generateToken(Long id, String username) {
+    public String generateToken(Long id, String username, String role) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, id, username);
+        return createToken(claims, id, username, role);
     }
 
     @Override
-    public String createToken(Map<String, Object> claims, Long id, String username) {
+    public String createToken(Map<String, Object> claims, Long id, String username, String role) {
         claims.put("email", username);
         return Jwts.builder()
                 .setClaims(claims)

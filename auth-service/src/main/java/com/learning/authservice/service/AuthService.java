@@ -6,7 +6,7 @@ public interface AuthService {
 
     User saveUser(User user);
 
-    String generateToken(Long id, String username);
+    String generateToken(Long id, String username, String role);
 
     void validateToken(String token);
 

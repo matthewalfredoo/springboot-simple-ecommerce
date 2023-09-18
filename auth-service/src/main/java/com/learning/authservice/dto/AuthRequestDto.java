@@ -17,4 +17,6 @@ public class AuthRequestDto {
 
     private String password;
 
+    private String role;
+
 }

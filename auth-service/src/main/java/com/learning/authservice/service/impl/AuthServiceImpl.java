@@ -28,8 +28,8 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String generateToken(Long id, String username) {
-        return jwtService.generateToken(id, username);
+    public String generateToken(Long id, String username, String role) {
+        return jwtService.generateToken(id, username, role);
     }
 
     @Override
