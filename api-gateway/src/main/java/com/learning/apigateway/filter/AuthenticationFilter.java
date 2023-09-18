@@ -1,14 +1,23 @@
 package com.learning.apigateway.filter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.learning.apigateway.dto.ApiResponseDto;
 import com.learning.apigateway.util.JwtUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
+
+import java.time.LocalDateTime;
 
 @Component
 public class AuthenticationFilter extends AbstractGatewayFilterFactory<AuthenticationFilter.Config> {
@@ -17,12 +26,14 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 
     private RouteValidator validator;
 
-    // private RestTemplate restTemplate;
-
     private JwtUtil jwtUtil;
 
-    public AuthenticationFilter() {
+    private final ObjectMapper objectMapper;
+
+    @Autowired
+    public AuthenticationFilter(ObjectMapper objectMapper) {
         super(Config.class);
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -31,7 +42,8 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             if (validator.isSecured.test(exchange.getRequest())) {
                 // header contains token or not
                 if (!exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
-                    throw new RuntimeException("Missing authorization header");
+                    String errorMessage = "Missing authorization header";
+                    return handleGatewayFilterExceptions(exchange, errorMessage, new RuntimeException(errorMessage));
                 }
 
                 // store Bearer token in variable
@@ -45,19 +57,40 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                 }
 
                 try {
-                    // REST call to auth-service
-                    /*restTemplate.getForObject(
-                            "http://auth-service/api/v1/auth/validate?token" + authorizationHeader,
-                            String.class
-                    );*/
                     jwtUtil.validateToken(authorizationHeader);
                 } catch (Exception e) {
                     LOGGER.error("Invalid token");
-                    throw new RuntimeException("Unauthorized access to this resource");
+
+                    String errorMessage = "Invalid authorization token";
+                    return handleGatewayFilterExceptions(exchange, errorMessage, e);
                 }
             }
+
             return chain.filter(exchange);
         });
+    }
+
+    private Mono<Void> handleGatewayFilterExceptions(ServerWebExchange exchange, String errorMessage, Exception e) {
+        ServerHttpResponse response = exchange.getResponse();
+        response.setStatusCode(HttpStatus.UNAUTHORIZED);
+
+        ApiResponseDto apiResponseDto = new ApiResponseDto();
+        apiResponseDto.setSuccess(false);
+        apiResponseDto.setMessage(errorMessage);
+        apiResponseDto.setTimestamp(LocalDateTime.now().toString());
+        apiResponseDto.setError(e.getClass().getSimpleName() + ": " + e.getMessage());
+
+        byte[] bytes;
+        try {
+            bytes = objectMapper.writeValueAsBytes(apiResponseDto);
+        } catch (JsonProcessingException jpe) {
+            throw new RuntimeException(jpe);
+        }
+        DataBuffer buffer = response.bufferFactory().wrap(bytes);
+
+        response.getHeaders().add("Content-Type", "application/json");
+
+        return response.writeWith(Mono.just(buffer));
     }
 
     public static class Config {
