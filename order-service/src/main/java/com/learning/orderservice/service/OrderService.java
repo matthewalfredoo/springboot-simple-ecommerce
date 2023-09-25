@@ -10,6 +10,8 @@ public interface OrderService {
 
     List<Order> getAllOrders();
 
+    List<Order> getOrdersByUserId(Long userId);
+
     Order getProductById(String orderId);
 
 }

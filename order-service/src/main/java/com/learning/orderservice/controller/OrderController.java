@@ -49,6 +49,20 @@ public class OrderController {
 
         // get the user id from the token (authorizationHeader)
         Jws<Claims> claimsJws = jwtService.validateToken(authorizationHeader);
+
+        // check the role of user
+        String role = claimsJws.getBody().get("role", String.class);
+        if(role.equals("admin")) {
+            ApiResponseDto apiResponseDto = new ApiResponseDto();
+            apiResponseDto.setSuccess(false);
+            apiResponseDto.setMessage("Only customers can place orders");
+            apiResponseDto.setTimestamp(LocalDateTime.now().toString());
+            apiResponseDto.setData(null);
+
+            return new ResponseEntity<>(apiResponseDto, HttpStatus.FORBIDDEN);
+        }
+
+        // get the user ID
         String userId = claimsJws.getBody().get("sub", String.class);
 
         order.setUserId(Long.parseLong(userId));
@@ -115,8 +129,22 @@ public class OrderController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponseDto> getAllOrders() {
-        List<Order> orders = orderService.getAllOrders();
+    public ResponseEntity<ApiResponseDto> getAllOrders(
+            @RequestHeader("Authorization")
+            String authorizationHeader
+    ) {
+        // get the user id from the token (authorizationHeader)
+        Jws<Claims> claimsJws = jwtService.validateToken(authorizationHeader);
+        String role = claimsJws.getBody().get("role", String.class);
+
+        List<Order> orders;
+
+        if(!role.equals("admin")) {
+            orders = orderService.getOrdersByUserId(Long.parseLong(claimsJws.getBody().get("sub", String.class)));
+        }
+        else {
+            orders = orderService.getAllOrders();
+        }
 
         List<OrderDto> orderDtos = orders.stream().map(OrderMapper::toOrderDto).toList();
 
@@ -132,9 +160,27 @@ public class OrderController {
     @GetMapping("/{orderId}")
     public ResponseEntity<ApiResponseDto> getOrderById(
             @PathVariable(name = "orderId")
-            String orderId
+            String orderId,
+
+            @RequestHeader("Authorization")
+            String authorizationHeader
     ) {
         Order order = orderService.getProductById(orderId);
+
+        // get the user id from the token (authorizationHeader)
+        Jws<Claims> claimsJws = jwtService.validateToken(authorizationHeader);
+        String role = claimsJws.getBody().get("role", String.class);
+        Long userId = Long.parseLong(claimsJws.getBody().get("sub", String.class));
+
+        if(!role.equals("admin") && !order.getUserId().equals(userId)) {
+            ApiResponseDto apiResponseDto = new ApiResponseDto();
+            apiResponseDto.setSuccess(false);
+            apiResponseDto.setMessage("You are not authorized to view this order");
+            apiResponseDto.setTimestamp(LocalDateTime.now().toString());
+            apiResponseDto.setData(null);
+
+            return new ResponseEntity<>(apiResponseDto, HttpStatus.FORBIDDEN);
+        }
 
         OrderDto orderDto = OrderMapper.toOrderDto(order);
 
