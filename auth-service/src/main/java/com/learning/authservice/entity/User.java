@@ -21,5 +21,6 @@ public class User {
     private String password;
     private String role;
 
-
+    public static String ROLE_ADMIN = "admin";
+    public static String ROLE_CUSTOMER = "customer";
 }
